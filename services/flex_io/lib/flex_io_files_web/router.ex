@@ -8,9 +8,8 @@ defmodule FlexIoFilesWeb.Router do
   scope "/api", FlexIoFilesWeb do
     pipe_through :api
 
-    # post "/files", FileController, :upload
-    # get "/files/:id", FileController, :show
-    # get "/files/:id/link", FileController, :link
-    # delete "/files/:id", FileController, :delete
+    post "/files", FileController, :upload
+    get "/files", FileController, :download
+    delete "/files", FileController, :delete
   end
 end

@@ -1,21 +1,4 @@
 defmodule FlexIoFilesWeb do
-  @moduledoc """
-  The entrypoint for defining your web interface, such
-  as controllers, components, channels, and so on.
-
-  This can be used in your application as:
-
-      use FlexIoFilesWeb, :controller
-      use FlexIoFilesWeb, :html
-
-  The definitions below will be executed for every controller,
-  component, etc, so keep them short and clean, focused
-  on imports, uses and aliases.
-
-  Do NOT define functions inside the quoted expressions
-  below. Instead, define additional modules and import
-  those modules here.
-  """
 
   def static_paths, do: ~w(assets fonts images favicon.ico robots.txt)
 
@@ -23,7 +6,6 @@ defmodule FlexIoFilesWeb do
     quote do
       use Phoenix.Router, helpers: false
 
-      # Import common connection and controller functions to use in pipelines
       import Plug.Conn
       import Phoenix.Controller
     end
@@ -38,8 +20,6 @@ defmodule FlexIoFilesWeb do
   def controller do
     quote do
       use Phoenix.Controller, formats: [:html, :json]
-
-      use Gettext, backend: FlexIoFilesWeb.Gettext
 
       import Plug.Conn
 

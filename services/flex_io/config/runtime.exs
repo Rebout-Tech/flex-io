@@ -1,4 +1,35 @@
 import Config
+import Dotenvy
+
+# ЗАГРУЗКА ПЕРЕМЕННЫХ ОКРУЖЕНИЯ (.env)
+
+loaded_env = source!([
+  ".env",
+  ".env.#{config_env()}",
+  System.get_env()
+])
+
+for {key, value} <- loaded_env, not String.starts_with?(key, "=") do
+  System.put_env(key, value)
+end
+
+# КОНФИГУРАЦИЯ ПРИЛОЖЕНИЯ
+
+config :flex_io_files,
+  storage_adapter: FlexIoFiles.Storage.Adapters.S3
+
+config :ex_aws,
+  json_codec: Jason,
+  access_key_id: env!("S3_ACCESS_KEY", :string),
+  secret_access_key: env!("S3_SECRET_KEY", :string),
+  region: env!("S3_REGION", :string, "us-east-1")
+
+config :ex_aws, :s3,
+  scheme: "http://",
+  host: env!("S3_HOST", :string),
+  port: env!("S3_PORT", :integer)
+
+# КОНФИГУРАЦИЯ PHOENIX ENDPOINT
 
 if System.get_env("PHX_SERVER") do
   config :flex_io_files, FlexIoFilesWeb.Endpoint, server: true
@@ -30,19 +61,4 @@ if config_env() == :prod do
     ],
     pubsub_server: FlexIoFiles.PubSub,
     live_view: [signing_salt: "unused"]
-
-  # ## SSL Support
-  #
-  # Если за сервисом стоит Nginx/Traefik/Ingress,
-  # то SSL терминируется на прокси, а сюда идет уже чистый HTTP.
-  #
-  # Если сервис должен сам работать по HTTPS (без прокси):
-  #
-  #     config :flex_io_files, FlexIoFilesWeb.Endpoint,
-  #       https: [
-  #         port: 443,
-  #         cipher_suite: :strong,
-  #         keyfile: System.get_env("SSL_KEY_PATH"),
-  #         certfile: System.get_env("SSL_CERT_PATH")
-  #       ]
 end
