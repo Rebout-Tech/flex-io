@@ -34,4 +34,11 @@ defmodule FlexIoFiles.Storage.Service do
       adapter.delete(safe_params)
     end
   end
+
+  def generate_url(params, opts \\ []) do
+    with {:ok, safe_params} <- validate_params(params),
+         adapter <- get_adapter() do
+      adapter.generate_url(safe_params, opts)
+    end
+  end
 end

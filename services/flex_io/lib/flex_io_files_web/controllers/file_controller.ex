@@ -3,8 +3,6 @@ defmodule FlexIoFilesWeb.FileController do
 
   alias FlexIoFiles.Storage.Service
 
-  # Загрузка файла
-  # Ожидаем JSON: {"bucket": "...", "folder": "...", "key": "...", "content": "BASE64"}
   def upload(conn, %{"bucket" => bucket, "folder" => folder, "key" => key} = params) do
     content_type = Map.get(params, "content_type", "application/octet-stream")
 
@@ -27,7 +25,6 @@ defmodule FlexIoFilesWeb.FileController do
     end
   end
 
-  # Скачивание файла
   def download(conn, %{"bucket" => bucket, "folder" => folder, "key" => key}) do
     file_params = %{bucket: bucket, folder: folder, key: key}
 
@@ -44,13 +41,32 @@ defmodule FlexIoFilesWeb.FileController do
     end
   end
 
-  # Удаление файла
   def delete(conn, %{"bucket" => bucket, "folder" => folder, "key" => key}) do
     file_params = %{bucket: bucket, folder: folder, key: key}
 
     case Service.delete(file_params) do
       :ok ->
         json(conn, %{status: "deleted"})
+
+      {:error, reason} ->
+        conn
+        |> put_status(:bad_request)
+        |> json(%{status: "error", reason: inspect(reason)})
+    end
+  end
+
+  def get_url(conn, %{"bucket" => bucket, "folder" => folder, "key" => key} = params) do
+    file_params = %{bucket: bucket, folder: folder, key: key}
+
+    expires_in =
+      case Integer.parse(params["expires"] || "") do
+        {value, _} when value > 0 -> value
+        _ -> 3600
+    end
+
+    case Service.generate_url(file_params, expires_in: expires_in) do
+      {:ok, url} ->
+        json(conn, %{status: "success", url: url, expires_in: expires_in})
 
       {:error, reason} ->
         conn
