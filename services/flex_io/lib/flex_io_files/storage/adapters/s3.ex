@@ -8,8 +8,7 @@ defmodule FlexIoFiles.Storage.Adapters.S3 do
   def upload(%{bucket: bucket, folder: folder, key: key}, content, content_type) do
     object_key = Path.join([folder, key])
 
-    request =
-      ExAws.S3.put_object(bucket, object_key, content, content_type: content_type)
+    request = ExAws.S3.put_object(bucket, object_key, content, content_type: content_type)
 
     case ExAws.request(request) do
       {:ok, _} -> {:ok, object_key}

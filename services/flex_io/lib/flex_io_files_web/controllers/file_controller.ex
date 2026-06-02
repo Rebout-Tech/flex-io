@@ -4,24 +4,38 @@ defmodule FlexIoFilesWeb.FileController do
   alias FlexIoFiles.Storage.Service
 
   def upload(conn, %{"bucket" => bucket, "folder" => folder, "key" => key} = params) do
-    content_type = Map.get(params, "content_type", "application/octet-stream")
+    case params["file"] do
+      %Plug.Upload{path: file_path, content_type: content_type, filename: filename} ->
+        with {:ok, content} <- File.read(file_path) do
+          file_params = %{bucket: bucket, folder: folder, key: key}
 
-    content =
-      case params["content"] do
-        nil -> ""
-        base64_str -> Base.decode64!(base64_str)
-      end
+          case Service.upload(file_params, content, content_type || "application/octet-stream") do
+            {:ok, path} ->
+              json(conn, %{status: "success", path: path, filename: filename})
 
-    file_params = %{bucket: bucket, folder: folder, key: key}
+            {:error, reason} ->
+              conn
+              |> put_status(:bad_request)
+              |> json(%{status: "error", reason: inspect(reason)})
+          end
+        else
+          {:error, :enoent} -> conn |> put_status(:bad_request) |> json(%{status: "error", reason: "file not found"})
+          {:error, reason} -> conn |> put_status(:internal_server_error) |> json(%{status: "error", reason: inspect(reason)})
+        end
 
-    case Service.upload(file_params, content, content_type) do
-      {:ok, path} ->
-        json(conn, %{status: "success", path: path})
+      base64_str when is_binary(base64_str) ->
+        content = Base.decode64!(base64_str)
+        content_type = Map.get(params, "content_type", "application/octet-stream")
+        file_params = %{bucket: bucket, folder: folder, key: key}
 
-      {:error, reason} ->
+        case Service.upload(file_params, content, content_type) do
+          {:ok, path} -> json(conn, %{status: "success", path: path})
+          {:error, reason} -> conn |> put_status(:bad_request) |> json(%{status: "error", reason: inspect(reason)})
+        end
+      _ ->
         conn
         |> put_status(:bad_request)
-        |> json(%{status: "error", reason: inspect(reason)})
+        |> json(%{status: "error", reason: "file field is required (as multipart or base64)"})
     end
   end
 
@@ -74,4 +88,5 @@ defmodule FlexIoFilesWeb.FileController do
         |> json(%{status: "error", reason: inspect(reason)})
     end
   end
+
 end

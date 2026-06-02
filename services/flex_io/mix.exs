@@ -43,7 +43,7 @@ defmodule FlexIoFiles.MixProject do
       {:ex_aws_s3, "~> 2.0"},
       {:sweet_xml, "~> 0.7"},
       {:hackney, "~> 1.17"},
-       {:dotenvy, "~> 1.1.0"},
+      {:dotenvy, "~> 1.1.0"},
       {:mox, "~> 1.0", only: [:test]}
     ]
   end
