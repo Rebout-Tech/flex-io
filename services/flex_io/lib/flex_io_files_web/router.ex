@@ -18,5 +18,6 @@ defmodule FlexIoFilesWeb.Router do
     get "/files", FileController, :download
     delete "/files", FileController, :delete
     get "/files/url", FileController, :get_url
+    post "/files/urls", FileController, :get_urls
   end
 end

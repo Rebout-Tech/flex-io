@@ -48,4 +48,30 @@ defmodule FlexIoFiles.Storage.Adapters.S3 do
       {:error, reason} -> {:error, reason}
     end
   end
+
+  @impl true
+  def generate_urls(file_infos, opts) do
+    config = ExAws.Config.new(:s3)
+
+    results =
+      Enum.map(file_infos, fn %{bucket: bucket, folder: folder, key: key} ->
+        object_key = Path.join([folder, key])
+
+        case ExAws.S3.presigned_url(config, :get, bucket, object_key, opts) do
+          {:ok, url} -> {:ok, %{key: key, url: url}}
+          {:error, reason} -> {:error, %{key: key, reason: inspect(reason)}}
+        end
+      end)
+
+    {successes, errors} = Enum.split_with(results, &match?({:ok, _}, &1))
+
+    successes = Enum.map(successes, fn {:ok, item} -> item end)
+    errors = Enum.map(errors, fn {:error, item} -> item end)
+
+    if Enum.empty?(errors) do
+      {:ok, successes}
+    else
+      {:ok, successes, errors}
+    end
+  end
 end

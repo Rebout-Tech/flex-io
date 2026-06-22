@@ -41,4 +41,37 @@ defmodule FlexIoFiles.Storage.Service do
       adapter.generate_url(safe_params, opts)
     end
   end
+
+  def generate_urls(file_infos, opts \\ []) when is_list(file_infos) do
+    adapter = get_adapter()
+
+    {valid_params, invalid_params} =
+      Enum.reduce(file_infos, {[], []}, fn params, {valid, invalid} ->
+        case validate_params(params) do
+          {:ok, safe_params} -> {[safe_params | valid], invalid}
+          {:error, reason} -> {valid, [%{params: params, reason: reason} | invalid]}
+        end
+      end)
+
+    valid_params = Enum.reverse(valid_params)
+    invalid_params = Enum.reverse(invalid_params)
+
+    case {valid_params, invalid_params} do
+      {[], _} -> {:ok, [], invalid_params}
+
+      {valid, []} ->
+        case adapter.generate_urls(valid, opts) do
+          {:ok, urls} -> {:ok, urls}
+          {:ok, urls, errors} -> {:ok, urls, errors}
+          {:error, reason} -> {:error, reason}
+        end
+
+      {valid, invalid} ->
+        case adapter.generate_urls(valid, opts) do
+          {:ok, urls} -> {:ok, urls, invalid}
+          {:ok, urls, errors} -> {:ok, urls, invalid ++ errors}
+          {:error, reason} -> {:error, reason}
+        end
+    end
+  end
 end
