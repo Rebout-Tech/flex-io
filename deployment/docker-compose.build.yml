@@ -1,6 +1,6 @@
 services:
   flex-io-builder:
     build:
-      context: ..
-      dockerfile: services/flex_io/Dockerfile
+      context: ../services/flex_io
+      dockerfile: Dockerfile
     image: flex-io/file-service:latest
