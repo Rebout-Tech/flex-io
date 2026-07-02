@@ -21,7 +21,7 @@ config :ex_aws,
   region: env!("S3_REGION", :string, "us-east-1")
 
 config :ex_aws, :s3,
-  scheme: "http://",
+  scheme: env!("S3_SCHEME", :string, "https://"),
   host: env!("S3_HOST", :string),
   port: env!("S3_PORT", :integer)
 

@@ -12,6 +12,7 @@ services:
       - S3_SECRET_KEY=
       - S3_HOST=
       - S3_PORT=
+      - S3_SCHEME=https://
     restart: unless-stopped
     networks:
       - flex-network
