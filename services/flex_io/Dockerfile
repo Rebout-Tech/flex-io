@@ -3,20 +3,25 @@ FROM elixir:1.18-slim AS builder
 ENV MIX_ENV=prod
 ENV LANG=C.UTF-8
 
+ENV HEX_HTTP_TIMEOUT=120 \
+    HEX_HTTP_CONCURRENCY=1 \
+    HEX_CDN_URL=https://repo.hex.pm
+
 RUN apt-get update && apt-get install -y build-essential git && apt-get clean
 
 WORKDIR /app
 
-RUN mix local.hex --force && \
+RUN mix archive.install github hexpm/hex branch latest --force && \
     mix local.rebar --force
 
 COPY mix.exs mix.lock ./
+
 RUN mix deps.get --only $MIX_ENV
 
 COPY config/ config/
 RUN mix deps.compile
 
-COPY lib lib
+COPY lib/ lib/
 
 RUN mix compile
 RUN mix release
@@ -35,6 +40,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
+
 ENV LANG=en_US.UTF-8
 ENV LANGUAGE=en_US:en
 ENV LC_ALL=en_US.UTF-8
