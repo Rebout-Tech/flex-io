@@ -1,8 +1,6 @@
 import Config
 import Dotenvy
 
-# ЗАГРУЗКА ПЕРЕМЕННЫХ ОКРУЖЕНИЯ (.env)
-
 loaded_env = source!([
   ".env",
   ".env.#{config_env()}",
@@ -12,8 +10,6 @@ loaded_env = source!([
 for {key, value} <- loaded_env, not String.starts_with?(key, "=") do
   System.put_env(key, value)
 end
-
-# КОНФИГУРАЦИЯ ПРИЛОЖЕНИЯ
 
 config :flex_io_files,
   storage_adapter: FlexIoFiles.Storage.Adapters.S3
@@ -25,15 +21,9 @@ config :ex_aws,
   region: env!("S3_REGION", :string, "us-east-1")
 
 config :ex_aws, :s3,
-  scheme: "http://",
+  scheme: env!("S3_SCHEME", :string, "https://"),
   host: env!("S3_HOST", :string),
   port: env!("S3_PORT", :integer)
-
-# КОНФИГУРАЦИЯ PHOENIX ENDPOINT
-
-if System.get_env("PHX_SERVER") do
-  config :flex_io_files, FlexIoFilesWeb.Endpoint, server: true
-end
 
 if config_env() == :prod do
   secret_key_base =
@@ -43,17 +33,17 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
-  host = System.get_env("PHX_HOST") || "example.com"
+  host = System.get_env("PHX_HOST") || "localhost"
   port = String.to_integer(System.get_env("PORT") || "4000")
 
   config :flex_io_files, FlexIoFilesWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
     http: [
-      ip: {0, 0, 0, 0, 0, 0, 0, 0},
-      port: port,
-      parser_options: [json: [max_length: 100_000_000]]
+      ip: {0, 0, 0, 0},
+      port: port
     ],
     secret_key_base: secret_key_base,
+    server: true,
     check_origin: false,
     render_errors: [
       formats: [json: FlexIoFilesWeb.ErrorJSON],

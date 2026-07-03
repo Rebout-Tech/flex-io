@@ -1,0 +1,22 @@
+services:
+  flex-io:
+    image: flex-io/file-service:latest
+    container_name: flex-io
+    ports:
+      - "4000:4000"
+    environment:
+      - MIX_ENV=prod
+      - SECRET_KEY_BASE= генерируется командой mix phx.gen.secret
+      - PORT=4000
+      - S3_ACCESS_KEY=
+      - S3_SECRET_KEY=
+      - S3_HOST=
+      - S3_PORT=
+      - S3_SCHEME=https://
+    restart: unless-stopped
+    networks:
+      - flex-network
+
+networks:
+  flex-network:
+    driver: bridge

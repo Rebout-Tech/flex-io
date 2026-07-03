@@ -13,7 +13,7 @@ config :ex_aws,
   region: "us-east-1"
 
 config :ex_aws, :s3,
-  scheme: "http://",
+  scheme: System.get_env("S3_SCHEME", "http://"),
   host: System.get_env("S3_HOST", "localhost"),
   port: System.get_env("S3_PORT", "8333"),
   region: "us-east-1"
