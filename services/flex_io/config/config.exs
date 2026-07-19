@@ -25,8 +25,7 @@ config :flex_io_files, FlexIoFilesWeb.Endpoint,
     formats: [json: FlexIoFilesWeb.ErrorJSON],
     layout: false
   ],
-  pubsub_server: FlexIoFiles.PubSub,
-  live_view: [signing_salt: "aBcDeFgHiJkLmNoPqRsTuVwXyZ123456"]
+  pubsub_server: FlexIoFiles.PubSub
 
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
