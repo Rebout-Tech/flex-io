@@ -1,6 +1,6 @@
 services:
   flex-io:
-    image: flex-io/file-service:latest
+    image: flex-io/file-service:1.0.0
     container_name: flex-io
     ports:
       - "4000:4000"

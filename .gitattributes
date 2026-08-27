@@ -1,0 +1,53 @@
+# ============================================
+# Общие настройки
+# ============================================
+
+* text=auto
+
+*.md      text
+*.txt     text
+*.json    text
+*.toml    text
+
+# ============================================
+# YAML
+# ============================================
+
+*.yml     text eol=lf linguist-language=YAML
+*.yaml    text eol=lf linguist-language=YAML
+
+# ============================================
+# Docker
+# ============================================
+
+Dockerfile         text eol=lf linguist-language=Dockerfile
+*.dockerignore     text eol=lf
+docker-compose*    text eol=lf linguist-language=YAML
+compose*.yml       text eol=lf linguist-language=YAML
+compose*.yaml      text eol=lf linguist-language=YAML
+.env*              text eol=lf linguist-language=Shell
+
+# ============================================
+# Elixir
+# ============================================
+
+*.ex       text eol=lf linguist-language=Elixir
+*.exs      text eol=lf linguist-language=Elixir
+*.eex      text eol=lf linguist-language=HTML
+*.heex     text eol=lf linguist-language=HTML
+*.leex     text eol=lf linguist-language=HTML
+*.sface    text eol=lf linguist-language=HTML
+mix.lock   text eol=lf linguist-generated=true
+
+*.config   text eol=lf linguist-language=Elixir
+.formatter.exs text eol=lf linguist-language=Elixir
+
+# ============================================
+# Исключения из статистики
+# ============================================
+
+assets/node_modules/** linguist-vendored=true
+deps/**                linguist-vendored=true
+_build/**              linguist-generated=true
+priv/static/**         linguist-generated=true
+.cover/**              linguist-generated=true
