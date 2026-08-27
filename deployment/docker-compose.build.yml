@@ -3,4 +3,4 @@ services:
     build:
       context: ../services/flex_io
       dockerfile: Dockerfile
-    image: flex-io/file-service:latest
+    image: flex-io/file-service:1.0.0
